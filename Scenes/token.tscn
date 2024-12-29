@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://byaj83hrel6ew"]
+[gd_scene load_steps=14 format=3 uid="uid://byaj83hrel6ew"]
 
 [ext_resource type="Script" path="res://Scripts/Token.cs" id="1_dew7i"]
 [ext_resource type="ArrayMesh" uid="uid://bonjjnocn0sde" path="res://Models/clubs.obj" id="2_8slde"]
@@ -14,7 +14,24 @@ material = SubResource("StandardMaterial3D_yldeg")
 radius = 0.45
 height = 0.9
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fs7in"]
+albedo_color = Color(3.46541e-06, 0, 0.80283, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8yix0"]
+albedo_color = Color(0.784314, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y5amk"]
+albedo_color = Color(0, 0, 0, 1)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_b1n0y"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8c55c"]
+size = Vector2(1, 1)
+center_offset = Vector3(0, 0, -0.5)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ni7mm"]
+albedo_color = Color(1, 1, 0, 1)
 
 [node name="Area3D" type="Area3D"]
 script = ExtResource("1_dew7i")
@@ -28,6 +45,7 @@ skeleton = NodePath("../..")
 transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
 visible = false
 mesh = ExtResource("2_8slde")
+surface_material_override/0 = SubResource("StandardMaterial3D_fs7in")
 
 [node name="diamonds" type="MeshInstance3D" parent="."]
 transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
@@ -38,14 +56,27 @@ mesh = ExtResource("3_kkg6m")
 transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
 visible = false
 mesh = ExtResource("4_i1ar5")
+surface_material_override/0 = SubResource("StandardMaterial3D_8yix0")
 
 [node name="spades" type="MeshInstance3D" parent="."]
 transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
 visible = false
 mesh = ExtResource("5_vcopo")
+surface_material_override/0 = SubResource("StandardMaterial3D_y5amk")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_b1n0y")
+
+[node name="background" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("PlaneMesh_8c55c")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_ni7mm")
+
+[node name="tokenLbl" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
+pixel_size = 0.01
+text = "(,)"
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]

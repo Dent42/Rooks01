@@ -36,6 +36,7 @@ public partial class Grid : Node3D
 	public int ySize;
 
 	public Token[,] matrix;
+	public Token[,] preview;
 	public Cell[,] cells;
 
 
@@ -50,6 +51,8 @@ public partial class Grid : Node3D
 
 		matrix = new Token[xSize, ySize];
 		fillGrid();
+
+		preview = new Token[xSize, ySize];
 
 		currentState = State.idle;
 	}
@@ -109,20 +112,24 @@ public partial class Grid : Node3D
 
 	public void processDrag(Vector3 mouseVector, int x0, int y0)
 	{
-		bool canPreview = updateDropPosition(mouseVector, x0, y0);
+		bool validDropSpot = updateDropPosition(mouseVector, x0, y0);
 
-		if (currentState == State.idle)
+		// if (currentState == State.idle)
+		// {
+		if (validDropSpot)
 		{
-			if (canPreview)
-			{
-				//do preview
-				doPreview(x0,y0);
-			}
+			//do preview
+			doPreview(x0, y0);
 		}
-		else if (currentState == State.preview)
+		else
 		{
-			//undo preview
+			doSnapBack();
 		}
+		// }
+		// else if (currentState == State.preview)
+		// {
+		// 	//undo preview
+		// }
 	}
 
 	//updates the dropX and dropY in the grid
@@ -138,6 +145,7 @@ public partial class Grid : Node3D
 			dropY = -1;
 			return false;
 		}
+
 		//if the drop position is not the same x or same y --> invalid
 		else if (xInt != x0 && yInt != y0)
 		{
@@ -145,6 +153,7 @@ public partial class Grid : Node3D
 			dropY = -1;
 			return false;
 		}
+
 		//if the drop position is exactly the same as x0,y0 --> invalid
 		else if (xInt == x0 && yInt == y0)
 		{
@@ -152,7 +161,9 @@ public partial class Grid : Node3D
 			dropY = -1;
 			return false;
 		}
-		else //valid drop point
+
+		//valid drop point
+		else
 		{
 			dropX = xInt;
 			dropY = yInt;
@@ -162,11 +173,159 @@ public partial class Grid : Node3D
 
 	private void doPreview(int x0, int y0)
 	{
+		if (dropX == x0 && dropY == y0)
+		{
+			GD.Print("TRYING TO PREVIEW DROP AT ORIGIN");
+			return;
+		}
+
+		resetPreviewGrid();
+		preview[dropX, dropY] = matrix[x0, y0];
+
 		if (dropX > x0)
 		{
-			for (int x = dropX; x > x0; x--)
+			for (int x = x0 + 1; x < xSize; x++)
 			{
-				matrix[x,y0].doPreview(-1, 0);
+				if (x <= dropX)
+				{
+					matrix[x, y0].doPreview(-1, 0);
+					preview[x - 1, y0] = matrix[x, y0];
+				}
+				else
+				{
+					matrix[x, y0].doSnapBack();
+				}
+			}
+		}
+		else if (dropX < x0)
+		{
+			for (int x = 0; x < x0; x++)
+			{
+				if (x >= dropX)
+				{
+					matrix[x, y0].doPreview(1, 0);
+					preview[x + 1, y0] = matrix[x, y0];
+				}
+				else
+				{
+					matrix[x, y0].doSnapBack();
+				}
+			}
+		}
+		else if (dropY > y0)
+		{
+			for (int y = y0 + 1; y < ySize; y++)
+			{
+				if (y <= dropY)
+				{
+					matrix[x0, y].doPreview(0, -1);
+					preview[x0, y - 1] = matrix[x0, y];
+				}
+				else
+				{
+					matrix[x0, y].doSnapBack();
+				}
+			}
+		}
+		else if (dropY < y0)
+		{
+			for (int y = 0; y < y0; y++)
+			{
+				if (y >= dropY)
+				{
+					matrix[x0, y].doPreview(0, 1);
+					preview[x0, y + 1] = matrix[x0, y];
+				}
+				else
+				{
+					matrix[x0, y].doSnapBack();
+				}
+			}
+		}
+
+		updateAdjacentAll();
+	}
+
+	private void updateAdjacentAll()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				updateAdjacent(x, y);
+			}
+		}
+	}
+
+	private void updateAdjacent(int xPreview, int yPreview)
+	{
+		Token token = preview[xPreview, yPreview];
+
+		token.adjacentX = 0;
+		token.adjacentY = 0;
+
+		//check -x
+		for (int x = xPreview - 1; x >= 0; x--)
+		{
+			if (token.suit == preview[x, yPreview].suit)
+			{
+				token.adjacentX += 1;
+			}
+			else break;
+		}
+
+		//check +x
+		for (int x = xPreview + 1; x < xSize; x++)
+		{
+			if (token.suit == preview[x, yPreview].suit)
+			{
+				token.adjacentX += 1;
+			}
+			else break;
+		}
+
+		//check -y
+		for (int y = yPreview - 1; y >= 0; y--)
+		{
+			if (token.suit == preview[xPreview, y].suit)
+			{
+				token.adjacentY += 1;
+			}
+			else break;
+		}
+
+		//check +y
+		for (int y = yPreview + 1; y < ySize; y++)
+		{
+			if (token.suit == preview[xPreview, y].suit)
+			{
+				token.adjacentY += 1;
+			}
+			else break;
+		}
+	}
+
+
+
+
+	public void doSnapBack()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				matrix[x, y].doSnapBack();
+			}
+		}
+	}
+
+	private void resetPreviewGrid()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				preview[x, y] = matrix[x, y];
 			}
 		}
 	}
