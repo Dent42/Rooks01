@@ -1,0 +1,52 @@
+[gd_scene load_steps=9 format=3 uid="uid://byaj83hrel6ew"]
+
+[ext_resource type="Script" path="res://Scripts/Token.cs" id="1_dew7i"]
+[ext_resource type="ArrayMesh" uid="uid://bonjjnocn0sde" path="res://Models/clubs.obj" id="2_8slde"]
+[ext_resource type="ArrayMesh" uid="uid://d10sffd34dnq6" path="res://Models/diamonds.obj" id="3_kkg6m"]
+[ext_resource type="ArrayMesh" uid="uid://c05sw8hi7t042" path="res://Models/hearts.obj" id="4_i1ar5"]
+[ext_resource type="ArrayMesh" uid="uid://uxj3m2i5hxj7" path="res://Models/spades.obj" id="5_vcopo"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yldeg"]
+albedo_color = Color(0.599057, 1.43189e-06, 4.33177e-07, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_x8l5i"]
+material = SubResource("StandardMaterial3D_yldeg")
+radius = 0.45
+height = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b1n0y"]
+
+[node name="Area3D" type="Area3D"]
+script = ExtResource("1_dew7i")
+
+[node name="default" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("SphereMesh_x8l5i")
+skeleton = NodePath("../..")
+
+[node name="clubs" type="MeshInstance3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
+visible = false
+mesh = ExtResource("2_8slde")
+
+[node name="diamonds" type="MeshInstance3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
+visible = false
+mesh = ExtResource("3_kkg6m")
+
+[node name="hearts" type="MeshInstance3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
+visible = false
+mesh = ExtResource("4_i1ar5")
+
+[node name="spades" type="MeshInstance3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, -2.18557e-06, -50, 0, 50, -2.18557e-06, 0, 0, 0)
+visible = false
+mesh = ExtResource("5_vcopo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_b1n0y")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

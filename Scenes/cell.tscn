@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://e1avutsg3rp"]
+
+[ext_resource type="Script" path="res://Scripts/Cell.cs" id="1_krmui"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_eebnr"]
+size = Vector2(1, 1)
+center_offset = Vector3(0, 0, -1)
+orientation = 2
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("mesh")]
+script = ExtResource("1_krmui")
+mesh = NodePath("MeshInstance3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_eebnr")
+skeleton = NodePath("../..")

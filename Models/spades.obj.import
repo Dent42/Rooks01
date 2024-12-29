@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://uxj3m2i5hxj7"
+path="res://.godot/imported/spades.obj-c66bc292427490cfd171bdddd8c5e8da.mesh"
+
+[deps]
+
+files=["res://.godot/imported/spades.obj-c66bc292427490cfd171bdddd8c5e8da.mesh"]
+
+source_file="res://Models/spades.obj"
+dest_files=["res://.godot/imported/spades.obj-c66bc292427490cfd171bdddd8c5e8da.mesh", "res://.godot/imported/spades.obj-c66bc292427490cfd171bdddd8c5e8da.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false
