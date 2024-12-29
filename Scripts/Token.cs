@@ -12,6 +12,7 @@ public partial class Token : Area3D
 		idle,
 		dragging,
 		snapPreview,
+		idlePreview,
 		snapBack
 	}
 
@@ -79,16 +80,25 @@ public partial class Token : Area3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if(currentState == State.idle)
+		{
+			return;
+		}
 		if (currentState == State.dragging)
 		{
 			Vector3 mouseVector = GameManager.GM.GetMouseCoordinates3D();
 			this.GlobalPosition = this.GlobalPosition.Lerp(mouseVector, (float)(25 * delta));
 
-			bool valid = GameManager.GRID.updateDropPosition(mouseVector, x0, y0);
+			GameManager.GRID.processDrag(mouseVector, x0, y0);
 			// int xInt = (int)Math.Round(mouseVector.X);
 			// int yInt = (int)Math.Round(mouseVector.Y);
 			// GameManager.GRID.dropX = xInt;
 			// GameManager.GRID.dropY = yInt;
+		}
+		else if (currentState == State.snapPreview)
+		{
+			Vector3 snapTo = new Vector3(x0+dx, y0+dy, 0);
+			this.Position = this.Position.MoveToward(snapTo, (float)(20 * delta));
 		}
 		else if (currentState == State.snapBack)
 		{
@@ -98,7 +108,7 @@ public partial class Token : Area3D
 			if (this.GlobalPosition == this.getInitialPosition())
 			{
 				// GD.Print("equal");
-				this.GlobalPosition = this.getInitialPosition();
+				//this.GlobalPosition = this.getInitialPosition();
 				currentState = State.idle;
 			}
 			else
@@ -109,4 +119,11 @@ public partial class Token : Area3D
 		}
 	}
 
+
+	public void doPreview(int dx, int dy)
+	{
+		this.dx = dx;
+		this.dy = dy;
+		this.currentState = State.snapPreview;
+	}
 }

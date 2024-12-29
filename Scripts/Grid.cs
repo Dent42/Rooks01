@@ -109,11 +109,24 @@ public partial class Grid : Node3D
 
 	public void processDrag(Vector3 mouseVector, int x0, int y0)
 	{
+		bool canPreview = updateDropPosition(mouseVector, x0, y0);
 
+		if (currentState == State.idle)
+		{
+			if (canPreview)
+			{
+				//do preview
+				doPreview(x0,y0);
+			}
+		}
+		else if (currentState == State.preview)
+		{
+			//undo preview
+		}
 	}
 
 	//updates the dropX and dropY in the grid
-	public bool updateDropPosition(Vector3 mouseVector, int x0, int y0)
+	private bool updateDropPosition(Vector3 mouseVector, int x0, int y0)
 	{
 		int xInt = (int)Math.Round(mouseVector.X);
 		int yInt = (int)Math.Round(mouseVector.Y);
@@ -126,7 +139,14 @@ public partial class Grid : Node3D
 			return false;
 		}
 		//if the drop position is not the same x or same y --> invalid
-		else if(xInt != x0 && yInt != y0)
+		else if (xInt != x0 && yInt != y0)
+		{
+			dropX = -1;
+			dropY = -1;
+			return false;
+		}
+		//if the drop position is exactly the same as x0,y0 --> invalid
+		else if (xInt == x0 && yInt == y0)
 		{
 			dropX = -1;
 			dropY = -1;
@@ -137,6 +157,17 @@ public partial class Grid : Node3D
 			dropX = xInt;
 			dropY = yInt;
 			return true;
+		}
+	}
+
+	private void doPreview(int x0, int y0)
+	{
+		if (dropX > x0)
+		{
+			for (int x = dropX; x > x0; x--)
+			{
+				matrix[x,y0].doPreview(-1, 0);
+			}
 		}
 	}
 
