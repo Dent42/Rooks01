@@ -87,7 +87,9 @@ public partial class Token : Area3D
 		if (currentState == State.dragging)
 		{
 			Vector3 mouseVector = GameManager.GM.GetMouseCoordinates3D();
-			this.GlobalPosition = this.GlobalPosition.Lerp(mouseVector, (float)(25 * delta));
+			
+			this.Position = this.Position.Lerp(mouseVector, (float)(25 * delta));
+			// this.GlobalPosition = this.GlobalPosition.Lerp(mouseVector, (float)(25 * delta));
 
 			GameManager.GRID.processDrag(mouseVector, x0, y0);
 			// int xInt = (int)Math.Round(mouseVector.X);
@@ -105,17 +107,26 @@ public partial class Token : Area3D
 			// GD.Print("This: " + this.GlobalPosition.ToString());
 			// GD.Print("Start: " + this.startPosition.ToString());
 
-			if (this.GlobalPosition == this.getInitialPosition())
+			if (this.Position != this.getInitialPosition())
 			{
-				// GD.Print("equal");
-				//this.GlobalPosition = this.getInitialPosition();
-				currentState = State.idle;
+				this.Position = this.Position.MoveToward(this.getInitialPosition(), (float)(25 * delta));	
 			}
 			else
 			{
-				// GD.Print("not equal");
-				this.Position = this.Position.MoveToward(this.getInitialPosition(), (float)(20 * delta));
+				currentState = State.idle;
 			}
+
+			// if (this.Position == this.getInitialPosition())
+			// {
+			// 	// GD.Print("equal");
+			// 	//this.GlobalPosition = this.getInitialPosition();
+			// 	currentState = State.idle;
+			// }
+			// else
+			// {
+			// 	// GD.Print("not equal");
+			// 	this.Position = this.Position.MoveToward(this.getInitialPosition(), (float)(25 * delta));
+			// }
 		}
 	}
 
