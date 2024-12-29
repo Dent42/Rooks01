@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://byaj83hrel6ew"]
 
-[ext_resource type="Script" path="res://Scripts/Token.cs" id="1_dew7i"]
+[ext_resource type="Script" path="res://Scripts/Gem.cs" id="1_dew7i"]
 [ext_resource type="ArrayMesh" uid="uid://bonjjnocn0sde" path="res://Models/clubs.obj" id="2_8slde"]
 [ext_resource type="ArrayMesh" uid="uid://d10sffd34dnq6" path="res://Models/diamonds.obj" id="3_kkg6m"]
 [ext_resource type="ArrayMesh" uid="uid://c05sw8hi7t042" path="res://Models/hearts.obj" id="4_i1ar5"]
@@ -73,7 +73,7 @@ mesh = SubResource("PlaneMesh_8c55c")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_ni7mm")
 
-[node name="tokenLbl" type="Label3D" parent="."]
+[node name="gemLbl" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
 pixel_size = 0.01
 text = "(,)"

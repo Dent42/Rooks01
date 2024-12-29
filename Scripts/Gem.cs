@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-public partial class Token : Area3D
+public partial class Gem : Area3D
 {
 
 	public string suit = "default";
@@ -50,13 +50,21 @@ public partial class Token : Area3D
 	{
 		if (currentState == State.dragging && evt.IsActionReleased("click"))
 		{
-			//TRY TO submit?
+			Vector3 mouseVector = GameManager.GM.GetMouseCoordinates3D();
+			bool validDragSpot = GameManager.GRID.processDrag(mouseVector, x0, y0);
 
+			if (validDragSpot)
+			{
+				//try submit
 
-			//snap back
-			currentState = State.snapBack;
-			GameManager.GRID.setValidCells(x0, y0, false);
-			GameManager.GRID.doSnapBack();
+			}
+			else
+			{
+				//snap back
+				currentState = State.snapBack;
+				GameManager.GRID.setValidCells(x0, y0, false);
+				GameManager.GRID.doSnapBack();
+			}
 		}
 	}
 
@@ -72,14 +80,14 @@ public partial class Token : Area3D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		
+
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		
+
 		//DEBUG
-		GetNode<Label3D>("tokenLbl").Text = "(" + adjacentX + "," + adjacentY + ")";
+		GetNode<Label3D>("gemLbl").Text = "(" + adjacentX + "," + adjacentY + ")";
 
 		if (currentState == State.idle || currentState == State.idlePreview)
 		{
@@ -135,15 +143,15 @@ public partial class Token : Area3D
 		this.adjacentX = 0;
 		this.adjacentY = 0;
 
-		if(currentState == State.idlePreview || currentState == State.snapPreview)
+		if (currentState == State.idlePreview || currentState == State.snapPreview)
 		{
 			this.currentState = State.snapBack;
 		}
 	}
 
-	
 
-	
+
+
 	public void _on_mouse_entered()
 	{
 		MeshInstance3D mi = this.GetNode<MeshInstance3D>(suit);

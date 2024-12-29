@@ -8,8 +8,8 @@ public partial class Grid : Node3D
 	public static readonly string[] suits = { "clubs", "diamonds", "hearts", "spades" };
 
 
-	public int dropX = -1;
-	public int dropY = -1;
+	public int dragX = -1;
+	public int dragY = -1;
 
 	public enum State : int
 	{
@@ -35,8 +35,8 @@ public partial class Grid : Node3D
 	[Export]
 	public int ySize;
 
-	public Token[,] matrix;
-	public Token[,] preview;
+	public Gem[,] matrix;
+	public Gem[,] preview;
 	public Cell[,] cells;
 
 
@@ -49,10 +49,10 @@ public partial class Grid : Node3D
 		cells = new Cell[xSize, ySize];
 		fillCells();
 
-		matrix = new Token[xSize, ySize];
+		matrix = new Gem[xSize, ySize];
 		fillGrid();
 
-		preview = new Token[xSize, ySize];
+		preview = new Gem[xSize, ySize];
 
 		currentState = State.idle;
 	}
@@ -79,18 +79,16 @@ public partial class Grid : Node3D
 		{
 			for (int y = 0; y < ySize; y++)
 			{
-				Token token = GameManager.TokenScene.Instantiate<Token>();
+				Gem gem = GameManager.GemScene.Instantiate<Gem>();
 				int i = random.Next(suits.Length);
-				token.suit = suits[i];
+				gem.suit = suits[i];
 
-				token.Position = new Vector3(x, y, 0);
-				token.x0 = x;
-				token.y0 = y;
-				// token.getInitialPosition() = new Vector3(x, y, 0);
-				matrix[x, y] = token;
+				gem.Position = new Vector3(x, y, 0);
+				gem.x0 = x;
+				gem.y0 = y;
+				matrix[x, y] = gem;
 
-				//token.Owner = this.GetTree().EditedSceneRoot;
-				this.AddChild(token);
+				this.AddChild(gem);
 			}
 		}
 	}
@@ -110,13 +108,19 @@ public partial class Grid : Node3D
 		}
 	}
 
-	public void processDrag(Vector3 mouseVector, int x0, int y0)
+
+	public bool trySubmit()
 	{
-		bool validDropSpot = updateDropPosition(mouseVector, x0, y0);
+		return false;
+	}
+
+	public bool processDrag(Vector3 mouseVector, int x0, int y0)
+	{
+		bool validDragSpot = updateDragPosition(mouseVector, x0, y0);
 
 		// if (currentState == State.idle)
 		// {
-		if (validDropSpot)
+		if (validDragSpot)
 		{
 			//do preview
 			doPreview(x0, y0);
@@ -125,68 +129,64 @@ public partial class Grid : Node3D
 		{
 			doSnapBack();
 		}
-		// }
-		// else if (currentState == State.preview)
-		// {
-		// 	//undo preview
-		// }
+		return validDragSpot;
 	}
 
-	//updates the dropX and dropY in the grid
-	private bool updateDropPosition(Vector3 mouseVector, int x0, int y0)
+	//updates the dragX and dragY in the grid
+	private bool updateDragPosition(Vector3 mouseVector, int x0, int y0)
 	{
 		int xInt = (int)Math.Round(mouseVector.X);
 		int yInt = (int)Math.Round(mouseVector.Y);
 
-		// if the drop position is off the grid --> invalid
+		// if the drag position is off the grid --> invalid
 		if (xInt < 0 || yInt < 0 || xInt >= xSize || yInt >= ySize)
 		{
-			dropX = -1;
-			dropY = -1;
+			dragX = -1;
+			dragY = -1;
 			return false;
 		}
 
-		//if the drop position is not the same x or same y --> invalid
+		//if the drag position is not the same x or same y --> invalid
 		else if (xInt != x0 && yInt != y0)
 		{
-			dropX = -1;
-			dropY = -1;
+			dragX = -1;
+			dragY = -1;
 			return false;
 		}
 
-		//if the drop position is exactly the same as x0,y0 --> invalid
+		//if the drag position is exactly the same as x0,y0 --> invalid
 		else if (xInt == x0 && yInt == y0)
 		{
-			dropX = -1;
-			dropY = -1;
+			dragX = -1;
+			dragY = -1;
 			return false;
 		}
 
-		//valid drop point
+		//valid drag point
 		else
 		{
-			dropX = xInt;
-			dropY = yInt;
+			dragX = xInt;
+			dragY = yInt;
 			return true;
 		}
 	}
 
 	private void doPreview(int x0, int y0)
 	{
-		if (dropX == x0 && dropY == y0)
+		if (dragX == x0 && dragY == y0)
 		{
 			GD.Print("TRYING TO PREVIEW DROP AT ORIGIN");
 			return;
 		}
 
 		resetPreviewGrid();
-		preview[dropX, dropY] = matrix[x0, y0];
+		preview[dragX, dragY] = matrix[x0, y0];
 
-		if (dropX > x0)
+		if (dragX > x0)
 		{
 			for (int x = x0 + 1; x < xSize; x++)
 			{
-				if (x <= dropX)
+				if (x <= dragX)
 				{
 					matrix[x, y0].doPreview(-1, 0);
 					preview[x - 1, y0] = matrix[x, y0];
@@ -197,11 +197,11 @@ public partial class Grid : Node3D
 				}
 			}
 		}
-		else if (dropX < x0)
+		else if (dragX < x0)
 		{
 			for (int x = 0; x < x0; x++)
 			{
-				if (x >= dropX)
+				if (x >= dragX)
 				{
 					matrix[x, y0].doPreview(1, 0);
 					preview[x + 1, y0] = matrix[x, y0];
@@ -212,11 +212,11 @@ public partial class Grid : Node3D
 				}
 			}
 		}
-		else if (dropY > y0)
+		else if (dragY > y0)
 		{
 			for (int y = y0 + 1; y < ySize; y++)
 			{
-				if (y <= dropY)
+				if (y <= dragY)
 				{
 					matrix[x0, y].doPreview(0, -1);
 					preview[x0, y - 1] = matrix[x0, y];
@@ -227,11 +227,11 @@ public partial class Grid : Node3D
 				}
 			}
 		}
-		else if (dropY < y0)
+		else if (dragY < y0)
 		{
 			for (int y = 0; y < y0; y++)
 			{
-				if (y >= dropY)
+				if (y >= dragY)
 				{
 					matrix[x0, y].doPreview(0, 1);
 					preview[x0, y + 1] = matrix[x0, y];
@@ -259,17 +259,17 @@ public partial class Grid : Node3D
 
 	private void updateAdjacent(int xPreview, int yPreview)
 	{
-		Token token = preview[xPreview, yPreview];
+		Gem gem = preview[xPreview, yPreview];
 
-		token.adjacentX = 0;
-		token.adjacentY = 0;
+		gem.adjacentX = 0;
+		gem.adjacentY = 0;
 
 		//check -x
 		for (int x = xPreview - 1; x >= 0; x--)
 		{
-			if (token.suit == preview[x, yPreview].suit)
+			if (gem.suit == preview[x, yPreview].suit)
 			{
-				token.adjacentX += 1;
+				gem.adjacentX += 1;
 			}
 			else break;
 		}
@@ -277,9 +277,9 @@ public partial class Grid : Node3D
 		//check +x
 		for (int x = xPreview + 1; x < xSize; x++)
 		{
-			if (token.suit == preview[x, yPreview].suit)
+			if (gem.suit == preview[x, yPreview].suit)
 			{
-				token.adjacentX += 1;
+				gem.adjacentX += 1;
 			}
 			else break;
 		}
@@ -287,9 +287,9 @@ public partial class Grid : Node3D
 		//check -y
 		for (int y = yPreview - 1; y >= 0; y--)
 		{
-			if (token.suit == preview[xPreview, y].suit)
+			if (gem.suit == preview[xPreview, y].suit)
 			{
-				token.adjacentY += 1;
+				gem.adjacentY += 1;
 			}
 			else break;
 		}
@@ -297,9 +297,9 @@ public partial class Grid : Node3D
 		//check +y
 		for (int y = yPreview + 1; y < ySize; y++)
 		{
-			if (token.suit == preview[xPreview, y].suit)
+			if (gem.suit == preview[xPreview, y].suit)
 			{
-				token.adjacentY += 1;
+				gem.adjacentY += 1;
 			}
 			else break;
 		}

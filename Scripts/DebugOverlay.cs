@@ -19,6 +19,6 @@ public partial class DebugOverlay : Control
 	{
 		coordinates.Text = GameManager.GM.GetMouseCoordinates3D().ToString() + "\n" +
 			GameManager.GRID.currentState.ToString() + "\n" +
-			GameManager.GRID.dropX + " , " + GameManager.GRID.dropY;
+			GameManager.GRID.dragX + " , " + GameManager.GRID.dragY;
 	}
 }

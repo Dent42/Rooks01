@@ -8,7 +8,7 @@ public partial class GameManager : Node
 	public static Grid GRID;
 
 	public static PackedScene CellScene;
-	public static PackedScene TokenScene;
+	public static PackedScene GemScene;
 	private Plane zeroPlane;
 
 	
@@ -35,7 +35,7 @@ public partial class GameManager : Node
 	public override void _Ready()
 	{
 		GM = this;
-		TokenScene = GD.Load<PackedScene>("res://Scenes/token.tscn");
+		GemScene = GD.Load<PackedScene>("res://Scenes/gem.tscn");
 		CellScene = GD.Load<PackedScene>("res://Scenes/cell.tscn");
 		zeroPlane = new Plane(new Vector3(0, 0, 1));
 	}
