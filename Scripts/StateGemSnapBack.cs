@@ -9,8 +9,8 @@ public class StateGemSnapBack : StateGem
 
         g.dx = 0;
         g.dy = 0;
-        g.adjacentX = 0;
-        g.adjacentY = 0;
+        // g.adjacentX = 0;
+        // g.adjacentY = 0;
 
         //TODO maybe better way to do this?
         //GameManager.GRID.doSnapBack();

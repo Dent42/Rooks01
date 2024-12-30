@@ -128,6 +128,10 @@ public partial class Grid : Node3D
 		else
 		{
 			doSnapBack();
+			
+			//TODO is below code necessary?
+			resetPreviewGrid();
+			updateAdjacentAll();
 		}
 		return validDragSpot;
 	}

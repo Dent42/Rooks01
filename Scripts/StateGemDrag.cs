@@ -12,7 +12,7 @@ public class StateGemDrag : StateGem
     public override void ExitState(Gem g)
     {
         GameManager.GRID.setValidCells(g.x0, g.y0, false);
-        GameManager.GRID.doSnapBack();
+        //GameManager.GRID.doSnapBack();
     }
 
     public override void Update(Gem g, double delta)
@@ -31,7 +31,17 @@ public class StateGemDrag : StateGem
             bool validDragSpot = GameManager.GRID.processDrag(mouseVector, g.x0, g.y0);
 
             //TODO change auto snap back
-            g.changeState(g.snapBack);
+            if(validDragSpot)
+            {
+                //get drop point from grid, adjust dx and dy, switch to SnapPreview TODO change to else
+                g.dx = GameManager.GRID.dragX - g.x0;
+                g.dy = GameManager.GRID.dragY - g.y0;
+                g.changeState(g.snapPreview);
+            }
+            else
+            {
+                g.changeState(g.snapBack);
+            }
         }
     }
 
