@@ -5,7 +5,7 @@ public class StateGemIdle : StateGem
 {
     public override void EnterState(Gem g) { }
 
-    public override void ExitState(Gem g) { }
+    public override void ExitState(Gem g, StateGem nextState) { }
 
     public override void Update(Gem g, double delta)
     {
@@ -27,6 +27,10 @@ public class StateGemIdle : StateGem
         if(s == Gem.PREVIEW)
         {
             g.changeState(g.snapPreview);
+        }
+        else if(s == Gem.FREEZE)
+        {
+            g.changeState(g.freeze);
         }
     }
 }

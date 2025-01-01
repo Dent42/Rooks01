@@ -1,0 +1,9 @@
+    public override void EnterState(Gem g) { }
+
+    public override void ExitState(Gem g, StateGem nextState) { }
+
+    public override void Update(Gem g, double delta) { }
+
+    public override void HandleInput(Gem g, InputEvent evt) { }
+
+    public override void Trigger(Gem g, String s) { }

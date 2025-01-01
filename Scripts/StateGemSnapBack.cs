@@ -16,7 +16,7 @@ public class StateGemSnapBack : StateGem
         //GameManager.GRID.doSnapBack();
     }
 
-    public override void ExitState(Gem g) { }
+    public override void ExitState(Gem g, StateGem nextState) { }
 
     public override void Update(Gem g, double delta)
     {

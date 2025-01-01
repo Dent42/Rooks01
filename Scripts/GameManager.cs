@@ -7,6 +7,8 @@ public partial class GameManager : Node
 	public static GameManager GM;
 	public static Grid GRID;
 
+	public static string DEBUG_GEM;
+
 	public static PackedScene CellScene;
 	public static PackedScene GemScene;
 	private Plane zeroPlane;

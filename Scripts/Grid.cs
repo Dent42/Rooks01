@@ -11,23 +11,23 @@ public partial class Grid : Node3D
 	public int dragX = -1;
 	public int dragY = -1;
 
-	public enum State : int
-	{
-		idle,
-		preview,
-		// draggingValid,
-		// draggingInvalid,//maybe consolidate
-		// generatingPreview,
-		// snapBack,
-		// submitting,
-		// calculatingNeighbors,
-		// checkingPops,
-		// processingPops,
-		// processingDrops,
-		nothing
-	}
+	// public enum State : int
+	// {
+	// 	idle,
+	// 	preview,
+	// 	// draggingValid,
+	// 	// draggingInvalid,//maybe consolidate
+	// 	// generatingPreview,
+	// 	// snapBack,
+	// 	// submitting,
+	// 	// calculatingNeighbors,
+	// 	// checkingPops,
+	// 	// processingPops,
+	// 	// processingDrops,
+	// 	nothing
+	// }
 
-	public State currentState;
+	// public State currentState;
 
 	[Export]
 	public int xSize;
@@ -39,6 +39,9 @@ public partial class Grid : Node3D
 	public Gem[,] preview;
 	public Cell[,] cells;
 
+	public int numFrozen;
+	public int totalGems;
+
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -46,15 +49,18 @@ public partial class Grid : Node3D
 		GameManager.GRID = this;
 		random = new System.Random();
 
-		cells = new Cell[xSize, ySize];
-		fillCells();
-
 		matrix = new Gem[xSize, ySize];
 		fillGrid();
 
 		preview = new Gem[xSize, ySize];
 
-		currentState = State.idle;
+		cells = new Cell[xSize, ySize];
+		fillCells();
+
+		numFrozen = 0;
+		totalGems = xSize * ySize;
+
+		// currentState = State.idle;
 	}
 
 	public void fillCells()
@@ -79,9 +85,7 @@ public partial class Grid : Node3D
 		{
 			for (int y = 0; y < ySize; y++)
 			{
-				Gem gem = GameManager.GemScene.Instantiate<Gem>();
-				int i = random.Next(suits.Length);
-				gem.suit = suits[i];
+				Gem gem = createRandomGem();
 
 				gem.Position = new Vector3(x, y, 0);
 				gem.x0 = x;
@@ -91,6 +95,14 @@ public partial class Grid : Node3D
 				this.AddChild(gem);
 			}
 		}
+	}
+
+	private Gem createRandomGem()
+	{
+		Gem gem = GameManager.GemScene.Instantiate<Gem>();
+		int i = random.Next(suits.Length);
+		gem.suit = suits[i];
+		return gem;
 	}
 
 	public void setValidCells(int xValue, int yValue, bool isValid)
@@ -108,12 +120,6 @@ public partial class Grid : Node3D
 		}
 	}
 
-
-	public bool trySubmit()
-	{
-		return false;
-	}
-
 	public bool processDrag(Vector3 mouseVector, int x0, int y0)
 	{
 		bool validDragSpot = updateDragPosition(mouseVector, x0, y0);
@@ -128,10 +134,10 @@ public partial class Grid : Node3D
 		else
 		{
 			doSnapBack();
-			
+
 			//TODO is below code necessary?
 			resetPreviewGrid();
-			updateAdjacentAll();
+			updateAdjacentAll(preview);
 		}
 		return validDragSpot;
 	}
@@ -179,7 +185,7 @@ public partial class Grid : Node3D
 	{
 		if (dragX == x0 && dragY == y0)
 		{
-			GD.Print("TRYING TO PREVIEW DROP AT ORIGIN");
+			//GD.Print("TRYING TO PREVIEW DROP AT ORIGIN");
 			return;
 		}
 
@@ -247,31 +253,31 @@ public partial class Grid : Node3D
 			}
 		}
 
-		updateAdjacentAll();
+		updateAdjacentAll(preview);
 	}
 
-	private void updateAdjacentAll()
+	private void updateAdjacentAll(Gem[,] grid)
 	{
 		for (int x = 0; x < xSize; x++)
 		{
 			for (int y = 0; y < ySize; y++)
 			{
-				updateAdjacent(x, y);
+				updateAdjacent(grid, x, y);
 			}
 		}
 	}
 
-	private void updateAdjacent(int xPreview, int yPreview)
+	private void updateAdjacent(Gem[,] grid, int xUpdate, int yUpdate)
 	{
-		Gem gem = preview[xPreview, yPreview];
+		Gem gem = grid[xUpdate, yUpdate];
 
 		gem.adjacentX = 0;
 		gem.adjacentY = 0;
 
 		//check -x
-		for (int x = xPreview - 1; x >= 0; x--)
+		for (int x = xUpdate - 1; x >= 0; x--)
 		{
-			if (gem.suit == preview[x, yPreview].suit)
+			if (gem.suit == grid[x, yUpdate].suit)
 			{
 				gem.adjacentX += 1;
 			}
@@ -279,9 +285,9 @@ public partial class Grid : Node3D
 		}
 
 		//check +x
-		for (int x = xPreview + 1; x < xSize; x++)
+		for (int x = xUpdate + 1; x < xSize; x++)
 		{
-			if (gem.suit == preview[x, yPreview].suit)
+			if (gem.suit == grid[x, yUpdate].suit)
 			{
 				gem.adjacentX += 1;
 			}
@@ -289,9 +295,9 @@ public partial class Grid : Node3D
 		}
 
 		//check -y
-		for (int y = yPreview - 1; y >= 0; y--)
+		for (int y = yUpdate - 1; y >= 0; y--)
 		{
-			if (gem.suit == preview[xPreview, y].suit)
+			if (gem.suit == grid[xUpdate, y].suit)
 			{
 				gem.adjacentY += 1;
 			}
@@ -299,18 +305,15 @@ public partial class Grid : Node3D
 		}
 
 		//check +y
-		for (int y = yPreview + 1; y < ySize; y++)
+		for (int y = yUpdate + 1; y < ySize; y++)
 		{
-			if (gem.suit == preview[xPreview, y].suit)
+			if (gem.suit == grid[xUpdate, y].suit)
 			{
 				gem.adjacentY += 1;
 			}
 			else break;
 		}
 	}
-
-
-
 
 	public void doSnapBack()
 	{
@@ -333,6 +336,140 @@ public partial class Grid : Node3D
 			}
 		}
 	}
+
+	public bool canFreezePreview()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				if (preview[x, y].adjacentX > 1 || preview[x, y].adjacentY > 1)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void doFreezePreview()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				// 1) update the matrix first
+				Gem g = preview[x, y];
+				int xm = g.x0 + g.dx;
+				int ym = g.y0 + g.dy;
+				g.x0 = xm;
+				g.y0 = ym;
+				g.dx = 0;
+				g.dy = 0;
+				matrix[xm, ym] = g;
+
+				// 2) then trigger state change
+				g.doFreeze();
+			}
+		}
+	}
+
+	public void processBurst(Gem g)
+	{
+		matrix[g.x0, g.y0] = null;
+		preview[g.x0, g.y0] = null;
+	}
+
+	public bool checkFall(Gem g)
+	{
+		int drop = 0;
+
+		for (int y = g.y0 - 1; y >= 0; y--)
+		{
+			if (matrix[g.x0, y] != null)
+			{
+				break;
+			}
+			else
+			{
+				drop--;
+			}
+		}
+
+		if (drop != 0)
+		{
+			//null old matrix position
+			matrix[g.x0, g.y0] = null;
+
+			//adjust y0
+			g.y0 += drop;
+
+			//add to new position
+			matrix[g.x0, g.y0] = g;
+			return true;
+		}
+
+		else return false;
+	}
+
+
+	public void checkTopRow()
+	{
+		int yTop = ySize - 1;
+
+		for (int x = 0; x < xSize; x++)
+		{
+			if (matrix[x, yTop] == null)
+			{
+				//create gem, set above the grid
+				Gem gem = createRandomGem();
+
+				gem.Position = new Vector3(x, ySize, 0);
+				gem.x0 = x;
+				gem.y0 = yTop;
+				matrix[x, yTop] = gem;
+
+				this.AddChild(gem);
+				gem.changeState(gem.fall);
+			}
+		}
+	}
+
+	public bool checkAdjacents()
+	{
+		updateAdjacentAll(matrix);
+		return hasUnprocessedBursts();
+	}
+
+	private bool hasUnprocessedBursts()
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				if (matrix[x, y].adjacentX > 1 || matrix[x, y].adjacentY > 1)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void doIdle()
+	{
+		resetPreviewGrid();
+
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				Gem g = matrix[x,y];
+				g.currentState.Trigger(g, Gem.IDLE);
+			}
+		}
+	}
+
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)

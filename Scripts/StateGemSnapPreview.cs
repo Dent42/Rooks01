@@ -5,7 +5,7 @@ public class StateGemSnapPreview : StateGem
 {
     public override void EnterState(Gem g) { }
 
-    public override void ExitState(Gem g) { }
+    public override void ExitState(Gem g, StateGem nextState) { }
 
     public override void Update(Gem g, double delta)
     {

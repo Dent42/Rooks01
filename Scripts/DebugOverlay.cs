@@ -18,7 +18,8 @@ public partial class DebugOverlay : Control
 	public override void _Process(double delta)
 	{
 		coordinates.Text = GameManager.GM.GetMouseCoordinates3D().ToString() + "\n" +
-			GameManager.GRID.currentState.ToString() + "\n" +
-			GameManager.GRID.dragX + " , " + GameManager.GRID.dragY;
+			GameManager.GRID.dragX + " , " + GameManager.GRID.dragY + "\n" +
+			"# Frozen = " + GameManager.GRID.numFrozen + "/" + GameManager.GRID.totalGems + "\n" +
+			GameManager.DEBUG_GEM;
 	}
 }

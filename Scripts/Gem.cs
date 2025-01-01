@@ -10,6 +10,8 @@ public partial class Gem : Area3D
 
 	public static readonly string PREVIEW = "preview";
 	public static readonly string CANCEL = "cancel";
+	public static readonly string FREEZE = "freeze";
+	public static readonly string IDLE = "idle";
 
 
 	//state machine
@@ -20,10 +22,14 @@ public partial class Gem : Area3D
 	public StateGem snapBack = new StateGemSnapBack();
 	public StateGem snapPreview = new StateGemSnapPreview();
 	public StateGem idlePreview = new StateGemIdlePreview();
+	public StateGem tryFreeze = new StateGemTryFreeze();
+	public StateGem freeze = new StateGemFreeze();
+	public StateGem burst = new StateGemBurst();
+	public StateGem fall = new StateGemFall();
 
 	public void changeState(StateGem nextState)
 	{
-		currentState.ExitState(this);
+		currentState.ExitState(this, nextState);
 		currentState = nextState;
 		currentState.EnterState(this);
 	}
@@ -40,6 +46,10 @@ public partial class Gem : Area3D
 	//preview position
 	public int dx = 0;
 	public int dy = 0;
+	// public Vector3 getNewPosition()
+	// {
+	// 	return new Vector3(x0 + dx, y0 + dy, 0);
+	// }
 
 	//adjacent same suit
 	public int adjacentX = 0;
@@ -68,7 +78,6 @@ public partial class Gem : Area3D
 	//release click event
 	public override void _Input(InputEvent evt)
 	{
-		
 		//requires pre-check for some reason
 		if(currentState == drag && evt.IsActionReleased("click"))
 		{
@@ -104,6 +113,11 @@ public partial class Gem : Area3D
 		currentState.Trigger(this, CANCEL);
 	}
 
+	public void doFreeze()
+	{
+		currentState.Trigger(this, FREEZE);
+	}
+
 
 
 
@@ -111,11 +125,16 @@ public partial class Gem : Area3D
 	{
 		MeshInstance3D mi = this.GetNode<MeshInstance3D>(suit);
 		mi.Transparency = 0.5f;
+		GameManager.DEBUG_GEM = this.Name + "\n" + 
+			"(x0,y0) = " + this.x0 + "," + this.y0 + "\n" +
+			"(dx,dy) = " + this.dx + "," + this.dy + "\n" +
+			this.currentState.ToString();
 	}
 
 	public void _on_mouse_exited()
 	{
 		MeshInstance3D mi = this.GetNode<MeshInstance3D>(suit);
 		mi.Transparency = 0f;
+		GameManager.DEBUG_GEM = "-";
 	}
 }
