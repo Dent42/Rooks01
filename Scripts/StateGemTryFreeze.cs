@@ -9,6 +9,7 @@ public class StateGemTryFreeze : StateGem
         if(!GameManager.GRID.canFreezePreview())
         {
             g.changeState(g.snapBack);
+            GameManager.GRID.doSnapBack();
         }
     }
 

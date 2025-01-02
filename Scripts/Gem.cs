@@ -1,11 +1,15 @@
 using Godot;
 using System;
+using System.Runtime.Serialization;
 
 
 public partial class Gem : Area3D
 {
 
-	public string suit = "default";
+	[Export]
+	public Label3D debugLbl;
+
+	public string suit = "Default";
 	public readonly float speed = 25f;
 
 	public static readonly string PREVIEW = "preview";
@@ -60,8 +64,10 @@ public partial class Gem : Area3D
 	public override void _Ready()
 	{
 		GetNode<MeshInstance3D>(suit).Visible = true;
-		currentState = idle;
+		// currentState = idle;
+		currentState = freeze;
 		currentState.EnterState(this);
+		debugLbl.Visible = GameManager.DEBUG;
 	}
 
 	//press click event
@@ -95,7 +101,10 @@ public partial class Gem : Area3D
 	public override void _PhysicsProcess(double delta)
 	{
 		//DEBUG
-		GetNode<Label3D>("gemLbl").Text = "(" + adjacentX + "," + adjacentY + ")";
+		if(GameManager.DEBUG)
+		{
+			debugLbl.Text = "(" + adjacentX + "," + adjacentY + ")";
+		}	
 
 		currentState.Update(this, delta);
 	}
@@ -118,7 +127,10 @@ public partial class Gem : Area3D
 		currentState.Trigger(this, FREEZE);
 	}
 
-
+	public void doIdle()
+	{
+		currentState.Trigger(this, IDLE);
+	}
 
 
 	public void _on_mouse_entered()

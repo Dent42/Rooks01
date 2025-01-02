@@ -5,29 +5,11 @@ public partial class Grid : Node3D
 {
 
 	private System.Random random;
-	public static readonly string[] suits = { "clubs", "diamonds", "hearts", "spades" };
+	public static readonly string[] suits = { "Clubs", "Diamonds", "Hearts", "Spades", "Shamrock" };
 
 
 	public int dragX = -1;
 	public int dragY = -1;
-
-	// public enum State : int
-	// {
-	// 	idle,
-	// 	preview,
-	// 	// draggingValid,
-	// 	// draggingInvalid,//maybe consolidate
-	// 	// generatingPreview,
-	// 	// snapBack,
-	// 	// submitting,
-	// 	// calculatingNeighbors,
-	// 	// checkingPops,
-	// 	// processingPops,
-	// 	// processingDrops,
-	// 	nothing
-	// }
-
-	// public State currentState;
 
 	[Export]
 	public int xSize;
@@ -46,6 +28,8 @@ public partial class Grid : Node3D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		totalGems = xSize * ySize;
+
 		GameManager.GRID = this;
 		random = new System.Random();
 
@@ -56,9 +40,6 @@ public partial class Grid : Node3D
 
 		cells = new Cell[xSize, ySize];
 		fillCells();
-
-		numFrozen = 0;
-		totalGems = xSize * ySize;
 
 		// currentState = State.idle;
 	}
@@ -465,7 +446,19 @@ public partial class Grid : Node3D
 			for (int y = 0; y < ySize; y++)
 			{
 				Gem g = matrix[x,y];
-				g.currentState.Trigger(g, Gem.IDLE);
+				g.doIdle();
+			}
+		}
+	}
+
+	public void setDebug(bool enabled)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			for (int y = 0; y < ySize; y++)
+			{
+				Gem g = matrix[x,y];
+				g.debugLbl.Visible = enabled;
 			}
 		}
 	}

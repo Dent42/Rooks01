@@ -11,6 +11,10 @@ public class StateGemBurst : StateGem
     { 
         //TODO Run animation, then destroy
 
+
+        //score
+        GameManager.SCORE.scoreGem(g);
+
         //update grid and destroy
         GameManager.GRID.processBurst(g);
         g.QueueFree();

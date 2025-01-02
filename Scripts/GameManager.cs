@@ -6,6 +6,9 @@ public partial class GameManager : Node
 
 	public static GameManager GM;
 	public static Grid GRID;
+	public static Score SCORE;
+	
+	public static bool DEBUG = false;
 
 	public static string DEBUG_GEM;
 
@@ -14,10 +17,8 @@ public partial class GameManager : Node
 	private Plane zeroPlane;
 
 	
-
 	[Export]
 	public Camera3D camera;
-
 
 
 	public Vector3 GetMouseCoordinates3D()
