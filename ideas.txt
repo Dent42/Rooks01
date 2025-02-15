@@ -1,0 +1,6 @@
+add tarot cards and modifiers
+shamrocks or coins acumulate luck or money to buy stuff or it could be randomly given on a match
+add turn counter and game lost state
+add main menu
+add burst animation
+check android build

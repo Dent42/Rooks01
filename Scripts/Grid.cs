@@ -11,11 +11,8 @@ public partial class Grid : Node3D
 	public int dragX = -1;
 	public int dragY = -1;
 
-	[Export]
-	public int xSize;
-
-	[Export]
-	public int ySize;
+	public int xSize = 7;
+	public int ySize = 6;
 
 	public Gem[,] matrix;
 	public Gem[,] preview;
