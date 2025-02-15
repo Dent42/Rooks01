@@ -1,13 +1,16 @@
 Example code and basic prototype for a match 3 game.
 
 Game Style: Match 3 Puzzle
+
 Engine: Godot 4.3
+
 Script Language: C#
 
 Features: State Machine controls matches and gem behavior.
 
 License: CC-BY-SA-4.0
 https://creativecommons.org/licenses/by-sa/4.0/deed.en
+
 
 ----- ASSET ATTRIBUTIONS -----
 
